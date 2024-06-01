@@ -14,7 +14,14 @@ RUN apt-get update && apt-get install -y \
     graphviz-dev \
     git \
     git-lfs \
-    libgl1-mesa-glx
+    libgl1-mesa-glx \
+    awscli
+
+# Copy installation scripts
+COPY scripts/* /scripts/
+
+# Run installation scripts for opentofu and kubectl
+RUN /scripts/install_opentofu.sh
 
 # Install poetry
 RUN mkdir -p /home/poetry && \
