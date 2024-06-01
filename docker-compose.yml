@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  # Replace placeholder service name
+  gaia:
+    build:
+      context: .
+      # docker-compose file is only used in dev
+      target: dev
+      dockerfile: Dockerfile
+    # Replace placeholder service name
+    image: gaia-dev
+    # Replace placeholder service name
+    container_name: gaia-server
+    ports:
+      - '5000:8080'
