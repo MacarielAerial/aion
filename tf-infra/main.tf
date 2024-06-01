@@ -1,4 +1,3 @@
-resource "aws_s3_bucket_acl" "aion_bucket" {
+resource "aws_s3_bucket" "aion_bucket" {
   bucket = "aion-dev-34567"
-  acl    = "private"
 }
