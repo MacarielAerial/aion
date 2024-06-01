@@ -1,35 +1,36 @@
 [tool.poetry]
-name = "gaia"
+name = "aion"
 version = "0.0.0"
 description = "Template repository for a python project"
 authors = ["Yifei Yu"]
 readme = "README.md"
 packages = [
-    { include = "gaia", from = "src" }
+    { include = "aion", from = "src" }
 ]
 include = [
-    { path = "src/gaia/conf_default", format = "sdist" },
+    { path = "src/aion/conf_default", format = "sdist" },
     { path = "notebooks", format = "sdist" }
 ]
 
 [tool.poetry.dependencies]
 python = "~3.11"
-orjson = "^3.10.1"
-dacite = "^1.8.1"
-pydantic = "^2.7.0"
+orjson = "^3.10.3"
+pydantic = "^2.7.2"
+opencv-python = "^4.9.0.80"
+pillow = "^10.3.0"
 
 [tool.poetry.group.dev.dependencies]
 isort = "^5.13.2"
-pytest = "^8.1.1"
-mypy = "^1.9.0"
+pytest = "^8.2.1"
+mypy = "^1.10.0"
 flake8 = "^7.0.0"
-coverage = {extras = ["toml"], version = "^7.4.4"}
-black = "^24.4.0"
+coverage = {extras = ["toml"], version = "^7.5.3"}
+black = "^24.4.2"
 yamllint = "^1.35.1"
-semgrep = "^1.69.0"
+semgrep = "^1.74.0"
 ipykernel = "^6.29.4"
 nbformat = "^5.10.4"
-ruff = "^0.3.7"
+ruff = "^0.4.7"
 shellcheck-py = "^0.10.0.1"
 python-dotenv = "^1.0.1"
 

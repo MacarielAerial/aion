@@ -7,13 +7,14 @@ FROM python:3.11-slim-bookworm AS dev
 ENV PATH = "${PATH}:/home/poetry/bin"
 ENV POETRY_VIRTUALENVS_IN_PROJECT=1
 
-# Install graphviz, git and git lfs
+# Install graphviz, git, git lfs and image processing specific dependencies
 RUN apt-get update && apt-get install -y \
     curl \
     graphviz \
     graphviz-dev \
     git \
-    git-lfs
+    git-lfs \
+    libgl1-mesa-glx
 
 # Install poetry
 RUN mkdir -p /home/poetry && \

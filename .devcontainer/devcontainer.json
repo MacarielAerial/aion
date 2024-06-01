@@ -2,7 +2,7 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/docker-existing-docker-compose
 {
     // Replace placeholder service name
-	"name": "gaia-dev",
+	"name": "aion-dev",
 	// To launch multiple services, use docker-compose.yml rather than to use a single image
 	// "image": "abc-dev:latest",
 
@@ -16,7 +16,7 @@
 	// The 'service' property is the name of the service for the container that VS Code should
 	// use. Update this value and .devcontainer/docker-compose.yml to the real service name.
 	// Replace placeholder service name
-    "service": "gaia",
+    "service": "aion",
 	// "{localWorkspaceFolderBasename}",
 
 	// Mount ssh directory into the container instance
