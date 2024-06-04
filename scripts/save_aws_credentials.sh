@@ -15,7 +15,7 @@ fi
 PROFILE=$1
 
 # Export AWS credentials to environment variables
-eval $(aws configure export-credentials --profile "$PROFILE" --format env)
+eval "$(aws configure export-credentials --profile "$PROFILE" --format env)"
 
 # Check if the export was successful
 if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
