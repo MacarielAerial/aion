@@ -9,7 +9,8 @@ logger = logging.getLogger(__name__)
 
 
 class CircularObj(BaseModel):
-    uri: UUID
+    uri_image: UUID  # URI of the parent image
+    uri_circle: UUID
     centroid: Tuple[int, int]
     radius: int
     # Only include top left and bottom right corners of the rectangle
@@ -17,7 +18,6 @@ class CircularObj(BaseModel):
 
 
 class CircularObjs(BaseModel):
-    uri_image: UUID
     list_obj: List[CircularObj]
 
 

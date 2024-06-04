@@ -11,14 +11,14 @@ load_dotenv()
 
 app = FastAPI()
 
-# AWS S3 configuration using environment variables
-AWS_ACCESS_KEY_ID = os.environ["AWS_ACCESS_KEY_ID"]
-AWS_SECRET_ACCESS_KEY = os.environ["AWS_SECRET_ACCESS_KEY"]
-AWS_SESSION_TOKEN = os.environ["AWS_SESSION_TOKEN"]
-
 
 @app.post("/upload/")
 async def upload_file(file: UploadFile = File(...)) -> dict:
+    # AWS S3 configuration using environment variables
+    AWS_ACCESS_KEY_ID = os.environ["AWS_ACCESS_KEY_ID"]
+    AWS_SECRET_ACCESS_KEY = os.environ["AWS_SECRET_ACCESS_KEY"]
+    AWS_SESSION_TOKEN = os.environ["AWS_SESSION_TOKEN"]
+
     # Gather credentials
     credentials = AWSCredentials(
         access_key_id=AWS_ACCESS_KEY_ID,

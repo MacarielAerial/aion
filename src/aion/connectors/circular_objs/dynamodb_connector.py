@@ -1,11 +1,14 @@
 import logging
+from typing import Set
+from uuid import UUID
 
 import boto3
+from boto3.dynamodb.conditions import Key
 from botocore.exceptions import BotoCoreError, ClientError
 from fastapi import HTTPException
 from mypy_boto3_dynamodb.service_resource import DynamoDBServiceResource
 
-from aion.connectors.circular_objs.json_connector import CircularObjs
+from aion.connectors.circular_objs.json_connector import CircularObj, CircularObjs
 from aion.connectors.utils_connectors import AWSCredentials
 from aion.nodes.config import REGION
 
@@ -24,21 +27,90 @@ class DynamoDBConnector:
         self.table = client.Table("CircularObjsTable")
 
     def save(self, circular_objs: CircularObjs) -> dict:
+        uri_image: Set[str] = set(str(obj.uri_image) for obj in circular_objs.list_obj)
+
         try:
             # Convert Pydantic model to dictionary
-            item = circular_objs.model_dump()
+            items = circular_objs.model_dump()["list_obj"]
 
             # Convert UUIDs to strings
-            item["uri_image"] = str(item["uri_image"])
-            for obj in item["list_obj"]:
-                obj["uri"] = str(obj["uri"])
-            # Put the entire item into DynamoDB table
-            self.table.put_item(Item=item)
+            for item in items:
+                item["uri_image"] = str(item["uri_image"])
+                item["uri_circle"] = str(item["uri_circle"])
+
+            # Put items into DynamoDB table
+            with self.table.batch_writer() as batch:
+                for item in items:
+                    batch.put_item(Item=item)
+
             return {
-                "message": f"Item associated with image URI {item['uri_image']} successfully uploaded"
+                "message": f"Items associated with image URI {uri_image} successfully uploaded"
             }
         except (BotoCoreError, ClientError) as e:
             logger.error(f"Error uploading item to DynamoDB: {e}")
+            raise HTTPException(status_code=500, detail="Internal Server Error")
+        except Exception as e:
+            logger.error(f"Unexpected error: {e}")
+            raise HTTPException(status_code=500, detail="Unexpected Error")
+
+    def load_by_image(self, uri_image: UUID) -> CircularObjs:
+        try:
+            # Retrieve all circles associated with an image from remote
+            response: dict = self.table.query(  # type: ignore[assignment]
+                IndexName="UriImageIndex",
+                KeyConditionExpression=Key("uri_image").eq(str(uri_image)),
+            )
+            items = response.get("Items", [])
+            if not items:
+                raise HTTPException(
+                    status_code=404, detail=f"Image with URI {uri_image} not found"
+                )
+
+            # Convert the retrieved item to match Pydantic model
+            for item in items:
+                item["uri_image"] = UUID(item["uri_image"])
+                item["uri_circle"] = UUID(item["uri_circle"])
+                item["radius"] = int(item["radius"])
+                item["centroid"] = tuple(int(x) for x in item["centroid"])
+                item["bbox"] = tuple(
+                    tuple(int(x) for x in bbox_point) for bbox_point in item["bbox"]
+                )
+
+            # Validate typed data
+            circular_objs = CircularObjs.model_validate({"list_obj": items})
+
+            return circular_objs
+
+        except (BotoCoreError, ClientError) as e:
+            logger.error(f"Error downloading items from DynamoDB: {e}")
+            raise HTTPException(status_code=500, detail="Internal Server Error")
+        except Exception as e:
+            logger.error(f"Unexpected error: {e}")
+            raise HTTPException(status_code=500, detail="Unexpected Error")
+
+    def load_by_circle(self, uri_circle: UUID) -> CircularObj:
+        try:
+            # Request the item from remote
+            item: dict = self.table.get_item(Key={"uri_circle": str(uri_circle)})[
+                "Item"
+            ]
+
+            # Type fields to match the pydantic model
+            item["uri_image"] = UUID(item["uri_image"])
+            item["uri_circle"] = UUID(item["uri_circle"])
+            item["radius"] = int(item["radius"])
+            item["centroid"] = tuple(int(x) for x in item["centroid"])
+            item["bbox"] = tuple(
+                tuple(int(x) for x in bbox_point) for bbox_point in item["bbox"]
+            )
+
+            # Validate typed data
+            circular_obj = CircularObj.model_validate(item)
+
+            return circular_obj
+
+        except (BotoCoreError, ClientError) as e:
+            logger.error(f"Error downloading item from DynamoDB: {e}")
             raise HTTPException(status_code=500, detail="Internal Server Error")
         except Exception as e:
             logger.error(f"Unexpected error: {e}")

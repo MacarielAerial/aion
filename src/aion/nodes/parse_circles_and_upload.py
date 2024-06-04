@@ -22,14 +22,13 @@ logger = logging.getLogger("uvicorn.error")
 app = FastAPI()
 
 
-# AWS S3 configuration using environment variables
-AWS_ACCESS_KEY_ID = os.environ["AWS_ACCESS_KEY_ID"]
-AWS_SECRET_ACCESS_KEY = os.environ["AWS_SECRET_ACCESS_KEY"]
-AWS_SESSION_TOKEN = os.environ["AWS_SESSION_TOKEN"]
-
-
 @app.post("/parse_and_upload")
 async def parse_circles_and_upload(str_s3_path: str) -> dict:
+    # AWS S3 configuration using environment variables
+    AWS_ACCESS_KEY_ID = os.environ["AWS_ACCESS_KEY_ID"]
+    AWS_SECRET_ACCESS_KEY = os.environ["AWS_SECRET_ACCESS_KEY"]
+    AWS_SESSION_TOKEN = os.environ["AWS_SESSION_TOKEN"]
+
     # Gather credentials
     credentials = AWSCredentials(
         access_key_id=AWS_ACCESS_KEY_ID,
@@ -53,15 +52,21 @@ async def parse_circles_and_upload(str_s3_path: str) -> dict:
         circles = identify_circles(gray=gray)
 
     # Compile pydantic objects
-    circular_objs = CircularObjs(uri_image=uri_image, list_obj=[])
+    circular_objs = CircularObjs(list_obj=[])
     for x, y, r in circles:
         # Parse reproducible UUIDs
-        uri = generate_uuid_from_uuid_xyz(existing_uuid=uri_image, int_tuple=(x, y, r))
+        uri_circle = generate_uuid_from_uuid_xyz(
+            existing_uuid=uri_image, int_tuple=(x, y, r)
+        )
         # Parse bounding boxes based on centroid and radius information
         top_left: Tuple[int, int] = ((x - r), (y - r))
         bottom_right: Tuple[int, int] = ((x + r), (y + r))
         circular_obj = CircularObj(
-            uri=uri, centroid=(x, y), radius=r, bbox=(top_left, bottom_right)
+            uri_image=uri_image,
+            uri_circle=uri_circle,
+            centroid=(x, y),
+            radius=r,
+            bbox=(top_left, bottom_right),
         )
         circular_objs.list_obj.append(circular_obj)
 

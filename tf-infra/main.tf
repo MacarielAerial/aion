@@ -12,12 +12,24 @@ resource "aws_dynamodb_table" "circular_objs_table" {
   name           = "CircularObjsTable"
   billing_mode   = "PAY_PER_REQUEST"
 
-  hash_key       = "uri_image"
+  hash_key       = "uri_circle"
+
+  attribute {
+    name = "uri_circle"
+    type = "S"
+
+  }
 
   attribute {
     name = "uri_image"
     type = "S"
 
+  }
+
+  global_secondary_index {
+    name            = "UriImageIndex"
+    hash_key        = "uri_image"
+    projection_type = "ALL"
   }
 
   tags           = {
