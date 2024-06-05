@@ -1,13 +1,14 @@
-# Blob storage for images
-resource "aws_s3_bucket" "aion_bucket" {
-  bucket         = "aion-dev-34567"
+# Blob storage for images with circles
+resource "aws_s3_bucket" "aion_circle_bucket" {
+  bucket         = "aion-circle-dev-34567"
+  force_destroy  = true
 
   tags           = {
     Name         = "RawImageBucket"
   }
 }
 
-# NoSQL for JSON data
+# NoSQL for circle's JSON data
 resource "aws_dynamodb_table" "circular_objs_table" {
   name           = "CircularObjsTable"
   billing_mode   = "PAY_PER_REQUEST"
@@ -34,5 +35,23 @@ resource "aws_dynamodb_table" "circular_objs_table" {
 
   tags           = {
     Name         = "CircularObjsDynamoDBTable"
+  }
+}
+
+# NoSQL for resized image data
+resource "aws_dynamodb_table" "resized_frames_table" {
+  name           = "ResizedFramesTable"
+  billing_mode   = "PAY_PER_REQUEST"
+
+  hash_key       = "frame_id"
+
+  attribute {
+    name = "frame_id"
+    type = "N"
+
+  }
+
+  tags           = {
+    Name         = "ResizedFramesDynamoDBTable"
   }
 }

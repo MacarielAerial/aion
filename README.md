@@ -4,11 +4,19 @@
 
 A repository containing a prototype application that separates circular objects from their background.
 
+Users are directed to [local testing notebook](./notebooks/local_testing.ipynb) as demonstration of project output.
+
+The notebook breaks down challenges' requirements into individual pieces before addressing them with API calls.
+
 ## Areas of Improvement
 
 ### Minimalist Circle Identification Capability
 
 Circles in the image are identified through traditional non-machine-learning method. Such technique is reliable in a small scale but impractical in the long term with more varied input images.
+
+### Missing Evaluation Strategy
+
+Evaluation of algorithm output currently can only be done manually. While this is appropriate for a proof of concept. A production grade solution, if one involving machine learning, requires either annotated ground truth data or a generative model for more dynamic and probabilistic evaluation.
 
 ### Insufficient Query Capability
 
@@ -33,6 +41,8 @@ Local testing currently requires a remote sandbox environment on AWS. This may n
 ### Incomplete Deployment Logic
 
 Storage instances such as S3 and DynamoDB are deployed but compute instances such as Lambda / ECS are not deployed.
+
+A longer-term solution would be to deploy individual APIs as Lambdas before linking them together with S3 and DynamoDB with the help of EventBridge. EventBridge serves as a message broker, a central nervous system that links all components together in an infinitely scalable way.
 
 ### Minimalist Deployment
 
@@ -81,4 +91,16 @@ uvicorn aion.nodes.get_circular_objs:app --reload
 
 ```sh
 uvicorn aion.nodes.get_circular_obj:app --reload
+```
+
+### Start Image Resize Service
+
+```sh
+uvicorn aion.nodes.resize_images:app --reload
+```
+
+### Start Image Query Service
+
+```sh
+uvicorn aion.nodes.request_frames:app --reload
 ```

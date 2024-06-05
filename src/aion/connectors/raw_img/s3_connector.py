@@ -17,7 +17,7 @@ from mypy_boto3_s3 import S3Client
 from s3path import S3Path
 
 from aion.connectors.utils_connectors import AWSCredentials
-from aion.nodes.config import BUCKET_NAME, REGION
+from aion.nodes.config import CIRCLES_BUCKET_NAME, REGION
 from aion.nodes.utils_upload import generate_uuid_from_file
 
 logger = logging.getLogger("uvicorn.error")
@@ -54,7 +54,7 @@ class S3Connector:
 
         try:
             # Upload the file to S3
-            self.s3_client.upload_fileobj(buffer, BUCKET_NAME, s3_filename)
+            self.s3_client.upload_fileobj(buffer, CIRCLES_BUCKET_NAME, s3_filename)
             return {"original_filename": filename, "s3_filename": s3_filename}
         except NoCredentialsError:
             raise HTTPException(status_code=403, detail="Credentials not available")

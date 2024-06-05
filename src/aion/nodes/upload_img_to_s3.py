@@ -2,7 +2,6 @@ import os
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, UploadFile
-from mangum import Mangum
 
 from aion.connectors.raw_img.s3_connector import S3Connector as RawImgS3Connector
 from aion.connectors.utils_connectors import AWSCredentials
@@ -31,6 +30,3 @@ async def upload_file(file: UploadFile = File(...)) -> dict:
     response = raw_img_s3_connector.save(raw_img=file.file, filename=str(file.filename))
 
     return response
-
-
-handler = Mangum(app)
